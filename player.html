@@ -50,6 +50,7 @@
             <head>
                 <meta charset="UTF-8">
                 <title>Winamp</title>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"><\/script>
                 <style>
                     @font-face {
                         font-family: 'Pixel';
@@ -152,6 +153,10 @@
                         bottom: 5px;
                         color: #00ff00;
                         font-size: 10px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        max-width: 250px;
                     }
 
                     .controls-row {
@@ -276,7 +281,24 @@
                         const fileUrl = URL.createObjectURL(file);
                         audio.src = fileUrl;
                         audio.play();
-                        fileInfo.innerText = "Local File";
+                        
+                        fileInfo.innerText = "Loading Info...";
+
+                        if (window.jsmediatags) {
+                            window.jsmediatags.read(file, {
+                                onSuccess: function(tag) {
+                                    const tags = tag.tags;
+                                    const title = tags.title || file.name;
+                                    const artist = tags.artist || "Unknown";
+                                    fileInfo.innerText = artist + " - " + title;
+                                },
+                                onError: function(error) {
+                                    fileInfo.innerText = file.name;
+                                }
+                            });
+                        } else {
+                            fileInfo.innerText = file.name;
+                        }
                     }
                 });
 
