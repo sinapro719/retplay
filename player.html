@@ -2,267 +2,321 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Winamp Style Player</title>
+    <title>Winamp Launcher</title>
     <style>
-        @font-face {
-            font-family: 'Pixel';
-            src: url('https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-freelancer/5.0.0/fonts/pixel-font.ttf') format('truetype');
-        }
-
         body {
-            background-color: #3d3d3d;
+            font-family: sans-serif;
+            background-color: #222;
+            color: #fff;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
-            font-family: 'Courier New', Courier, monospace;
         }
-
-        .winamp-player {
-            width: 275px;
-            background-color: #292929;
-            border-top: 2px solid #5a5a5a;
-            border-left: 2px solid #5a5a5a;
-            border-right: 2px solid #202020;
-            border-bottom: 2px solid #202020;
-            padding: 5px;
-            position: relative;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
-        }
-
-        .title-bar {
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
             background: linear-gradient(to right, #000080, #1084d0);
-            height: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 4px;
-            cursor: move;
-            margin-bottom: 5px;
-        }
-
-        .title-bar-text {
             color: white;
-            font-size: 10px;
+            border: 2px solid #fff;
+            border-radius: 5px;
             font-weight: bold;
-            letter-spacing: 0.5px;
-            user-select: none;
         }
-
-        .title-bar-controls div {
-            width: 9px;
-            height: 9px;
-            background-color: #c0c0c0;
-            border: 1px solid white;
-            border-bottom-color: #404040;
-            border-right-color: #404040;
-            display: inline-block;
-            margin-left: 2px;
-            cursor: pointer;
+        button:hover {
+            opacity: 0.9;
         }
-
-        .screen-container {
-            background-color: #000;
-            border: 2px solid #404040;
-            border-bottom-color: #fff;
-            border-right-color: #fff;
-            height: 60px;
-            margin-bottom: 10px;
-            padding: 5px;
-            position: relative;
-        }
-
-        .time-display {
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            font-size: 32px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            position: absolute;
-            left: 10px;
-            top: 10px;
-        }
-
-        .visualizer {
-            position: absolute;
-            right: 5px;
-            top: 5px;
-            width: 80px;
-            height: 20px;
-            background: repeating-linear-gradient(
-                90deg,
-                #000,
-                #000 2px,
-                #00ff00 2px,
-                #00ff00 4px
-            );
-            opacity: 0.7;
-        }
-
-        .kbps-info {
-            position: absolute;
-            left: 10px;
-            bottom: 5px;
-            color: #00ff00;
-            font-size: 10px;
-        }
-
-        .controls-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .main-controls {
-            display: flex;
-            gap: 2px;
-        }
-
-        .btn {
-            background: linear-gradient(to bottom, #dcdcdc, #808080);
-            border: 1px solid #fff;
-            border-bottom-color: #404040;
-            border-right-color: #404040;
-            cursor: pointer;
-            width: 23px;
-            height: 18px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 10px;
-        }
-
-        .btn:active {
-            border: 1px solid #404040;
-            border-bottom-color: #fff;
-            border-right-color: #fff;
-            transform: translateY(1px);
-        }
-
-        .play-btn { width: 28px; }
-        
-        .icon-prev::before { content: "⏮"; font-size: 8px; }
-        .icon-play::before { content: "▶"; font-size: 8px; }
-        .icon-pause::before { content: "⏸"; font-size: 8px; }
-        .icon-stop::before { content: "⏹"; font-size: 8px; }
-        .icon-next::before { content: "⏭"; font-size: 8px; }
-        .icon-eject::before { content: "⏏"; font-size: 9px; font-weight: bold; }
-
-        .volume-slider {
-            width: 80px;
-            height: 10px;
-            -webkit-appearance: none;
-            background: #202020;
-            border: 1px solid #5a5a5a;
-            border-bottom-color: #fff;
-            border-right-color: #fff;
-        }
-        
-        .volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 10px;
-            height: 8px;
-            background: #c0c0c0;
-            border: 1px solid #fff;
-            border-bottom-color: #404040;
-            border-right-color: #404040;
-            cursor: pointer;
-        }
-
-        audio { display: none; }
-        #fileInput { display: none; }
     </style>
 </head>
 <body>
 
-<div class="winamp-player">
-    <div class="title-bar">
-        <span class="title-bar-text">WINAMP</span>
-        <div class="title-bar-controls">
-            <div>_</div>
-            <div>x</div>
-        </div>
-    </div>
-
-    <div class="screen-container">
-        <div class="visualizer"></div>
-        <div class="time-display" id="timeDisplay">00:00</div>
-        <div class="kbps-info" id="fileInfo">No File Loaded</div>
-    </div>
-
-    <div class="controls-row">
-        <div class="main-controls">
-            <button class="btn icon-prev" onclick="alert('Previous')"></button>
-            <button class="btn icon-play" id="playBtn"></button>
-            <button class="btn icon-pause" id="pauseBtn"></button>
-            <button class="btn icon-stop" id="stopBtn"></button>
-            <button class="btn icon-next" onclick="alert('Next')"></button>
-            <button class="btn icon-eject" id="ejectBtn" title="Open File"></button>
-        </div>
-        
-        <input type="range" min="0" max="100" value="50" class="volume-slider" id="volumeSlider">
-    </div>
-
-    <input type="file" id="fileInput" accept="audio/*">
-    <audio id="audioPlayer"></audio>
-
-</div>
+    <h2>برای اجرای موزیک پلیر کلیک کنید</h2>
+    <button onclick="openPlayer()">اجرای Winamp</button>
 
 <script>
-    const audio = document.getElementById('audioPlayer');
-    const playBtn = document.getElementById('playBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const ejectBtn = document.getElementById('ejectBtn');
-    const fileInput = document.getElementById('fileInput');
-    const timeDisplay = document.getElementById('timeDisplay');
-    const fileInfo = document.getElementById('fileInfo');
-    const volumeSlider = document.getElementById('volumeSlider');
+    function openPlayer() {
+        const width = 310;
+        const height = 200;
+        const left = (screen.width - width) / 2;
+        const top = (screen.height - height) / 2;
 
-    ejectBtn.addEventListener('click', () => {
-        fileInput.click();
-    });
+        const popup = window.open("", "WinampPlayer", `width=${width},height=${height},left=${left},top=${top},resizable=no,scrollbars=no`);
 
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const fileUrl = URL.createObjectURL(file);
-            audio.src = fileUrl;
-            audio.play();
-            fileInfo.innerText = "Playing Local File";
-        }
-    });
+        const playerCode = `
+            <!DOCTYPE html>
+            <html lang="fa" dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <title>Winamp</title>
+                <style>
+                    @font-face {
+                        font-family: 'Pixel';
+                        src: url('https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-freelancer/5.0.0/fonts/pixel-font.ttf') format('truetype');
+                    }
 
-    playBtn.addEventListener('click', () => {
-        if (audio.src) audio.play();
-    });
+                    body {
+                        background-color: #3d3d3d;
+                        margin: 0;
+                        padding: 0;
+                        font-family: 'Courier New', Courier, monospace;
+                        overflow: hidden;
+                    }
 
-    pauseBtn.addEventListener('click', () => {
-        audio.pause();
-    });
+                    .winamp-player {
+                        width: 275px;
+                        background-color: #292929;
+                        border-top: 2px solid #5a5a5a;
+                        border-left: 2px solid #5a5a5a;
+                        border-right: 2px solid #202020;
+                        border-bottom: 2px solid #202020;
+                        padding: 5px;
+                        position: relative;
+                        box-shadow: none;
+                        margin: 0 auto;
+                    }
 
-    stopBtn.addEventListener('click', () => {
-        audio.pause();
-        audio.currentTime = 0;
-        timeDisplay.innerText = "00:00";
-    });
+                    .title-bar {
+                        background: linear-gradient(to right, #000080, #1084d0);
+                        height: 14px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 0 4px;
+                        cursor: default;
+                        margin-bottom: 5px;
+                    }
 
-    volumeSlider.addEventListener('input', (e) => {
-        audio.volume = e.target.value / 100;
-    });
+                    .title-bar-text {
+                        color: white;
+                        font-size: 10px;
+                        font-weight: bold;
+                        letter-spacing: 0.5px;
+                        user-select: none;
+                    }
 
-    audio.addEventListener('timeupdate', () => {
-        const minutes = Math.floor(audio.currentTime / 60);
-        const seconds = Math.floor(audio.currentTime % 60);
-        timeDisplay.innerText = 
-            (minutes < 10 ? '0' : '') + minutes + ':' + 
-            (seconds < 10 ? '0' : '') + seconds;
-    });
-    
-    audio.addEventListener('ended', () => {
-        timeDisplay.innerText = "00:00";
-    });
+                    .title-bar-controls div {
+                        width: 9px;
+                        height: 9px;
+                        background-color: #c0c0c0;
+                        border: 1px solid white;
+                        border-bottom-color: #404040;
+                        border-right-color: #404040;
+                        display: inline-block;
+                        margin-left: 2px;
+                        cursor: pointer;
+                    }
+
+                    .screen-container {
+                        background-color: #000;
+                        border: 2px solid #404040;
+                        border-bottom-color: #fff;
+                        border-right-color: #fff;
+                        height: 60px;
+                        margin-bottom: 10px;
+                        padding: 5px;
+                        position: relative;
+                    }
+
+                    .time-display {
+                        color: #00ff00;
+                        font-family: 'Courier New', monospace;
+                        font-size: 32px;
+                        font-weight: bold;
+                        letter-spacing: 2px;
+                        position: absolute;
+                        left: 10px;
+                        top: 10px;
+                    }
+
+                    .visualizer {
+                        position: absolute;
+                        right: 5px;
+                        top: 5px;
+                        width: 80px;
+                        height: 20px;
+                        background: repeating-linear-gradient(
+                            90deg,
+                            #000,
+                            #000 2px,
+                            #00ff00 2px,
+                            #00ff00 4px
+                        );
+                        opacity: 0.7;
+                    }
+
+                    .kbps-info {
+                        position: absolute;
+                        left: 10px;
+                        bottom: 5px;
+                        color: #00ff00;
+                        font-size: 10px;
+                    }
+
+                    .controls-row {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-end;
+                    }
+
+                    .main-controls {
+                        display: flex;
+                        gap: 2px;
+                    }
+
+                    .btn {
+                        background: linear-gradient(to bottom, #dcdcdc, #808080);
+                        border: 1px solid #fff;
+                        border-bottom-color: #404040;
+                        border-right-color: #404040;
+                        cursor: pointer;
+                        width: 23px;
+                        height: 18px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        font-size: 10px;
+                    }
+
+                    .btn:active {
+                        border: 1px solid #404040;
+                        border-bottom-color: #fff;
+                        border-right-color: #fff;
+                        transform: translateY(1px);
+                    }
+
+                    .play-btn { width: 28px; }
+                    
+                    .icon-prev::before { content: "⏮"; font-size: 8px; }
+                    .icon-play::before { content: "▶"; font-size: 8px; }
+                    .icon-pause::before { content: "⏸"; font-size: 8px; }
+                    .icon-stop::before { content: "⏹"; font-size: 8px; }
+                    .icon-next::before { content: "⏭"; font-size: 8px; }
+                    .icon-eject::before { content: "⏏"; font-size: 9px; font-weight: bold; }
+
+                    .volume-slider {
+                        width: 80px;
+                        height: 10px;
+                        -webkit-appearance: none;
+                        background: #202020;
+                        border: 1px solid #5a5a5a;
+                        border-bottom-color: #fff;
+                        border-right-color: #fff;
+                    }
+                    
+                    .volume-slider::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        width: 10px;
+                        height: 8px;
+                        background: #c0c0c0;
+                        border: 1px solid #fff;
+                        border-bottom-color: #404040;
+                        border-right-color: #404040;
+                        cursor: pointer;
+                    }
+
+                    audio { display: none; }
+                    #fileInput { display: none; }
+                </style>
+            </head>
+            <body>
+
+            <div class="winamp-player">
+                <div class="title-bar">
+                    <span class="title-bar-text">WINAMP</span>
+                    <div class="title-bar-controls">
+                        <div onclick="window.close()">_</div>
+                        <div onclick="window.close()">x</div>
+                    </div>
+                </div>
+
+                <div class="screen-container">
+                    <div class="visualizer"></div>
+                    <div class="time-display" id="timeDisplay">00:00</div>
+                    <div class="kbps-info" id="fileInfo">No File</div>
+                </div>
+
+                <div class="controls-row">
+                    <div class="main-controls">
+                        <button class="btn icon-prev"></button>
+                        <button class="btn icon-play" id="playBtn"></button>
+                        <button class="btn icon-pause" id="pauseBtn"></button>
+                        <button class="btn icon-stop" id="stopBtn"></button>
+                        <button class="btn icon-next"></button>
+                        <button class="btn icon-eject" id="ejectBtn" title="Open File"></button>
+                    </div>
+                    
+                    <input type="range" min="0" max="100" value="50" class="volume-slider" id="volumeSlider">
+                </div>
+
+                <input type="file" id="fileInput" accept="audio/*">
+                <audio id="audioPlayer"></audio>
+
+            </div>
+
+            <script>
+                const audio = document.getElementById('audioPlayer');
+                const playBtn = document.getElementById('playBtn');
+                const pauseBtn = document.getElementById('pauseBtn');
+                const stopBtn = document.getElementById('stopBtn');
+                const ejectBtn = document.getElementById('ejectBtn');
+                const fileInput = document.getElementById('fileInput');
+                const timeDisplay = document.getElementById('timeDisplay');
+                const fileInfo = document.getElementById('fileInfo');
+                const volumeSlider = document.getElementById('volumeSlider');
+
+                ejectBtn.addEventListener('click', () => {
+                    fileInput.click();
+                });
+
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const fileUrl = URL.createObjectURL(file);
+                        audio.src = fileUrl;
+                        audio.play();
+                        fileInfo.innerText = "Local File";
+                    }
+                });
+
+                playBtn.addEventListener('click', () => {
+                    if (audio.src) audio.play();
+                });
+
+                pauseBtn.addEventListener('click', () => {
+                    audio.pause();
+                });
+
+                stopBtn.addEventListener('click', () => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    timeDisplay.innerText = "00:00";
+                });
+
+                volumeSlider.addEventListener('input', (e) => {
+                    audio.volume = e.target.value / 100;
+                });
+
+                audio.addEventListener('timeupdate', () => {
+                    const minutes = Math.floor(audio.currentTime / 60);
+                    const seconds = Math.floor(audio.currentTime % 60);
+                    timeDisplay.innerText = 
+                        (minutes < 10 ? '0' : '') + minutes + ':' + 
+                        (seconds < 10 ? '0' : '') + seconds;
+                });
+                
+                audio.addEventListener('ended', () => {
+                    timeDisplay.innerText = "00:00";
+                });
+            <\/script>
+            </body>
+            </html>
+        `;
+
+        popup.document.write(playerCode);
+        popup.document.close();
+    }
 </script>
 
 </body>
