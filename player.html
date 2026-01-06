@@ -147,6 +147,7 @@
         .icon-pause::before { content: "⏸"; font-size: 8px; }
         .icon-stop::before { content: "⏹"; font-size: 8px; }
         .icon-next::before { content: "⏭"; font-size: 8px; }
+        .icon-eject::before { content: "⏏"; font-size: 9px; font-weight: bold; }
 
         .volume-slider {
             width: 80px;
@@ -170,6 +171,7 @@
         }
 
         audio { display: none; }
+        #fileInput { display: none; }
     </style>
 </head>
 <body>
@@ -186,7 +188,7 @@
     <div class="screen-container">
         <div class="visualizer"></div>
         <div class="time-display" id="timeDisplay">00:00</div>
-        <div class="kbps-info">128 kbps | 44 khz</div>
+        <div class="kbps-info" id="fileInfo">No File Loaded</div>
     </div>
 
     <div class="controls-row">
@@ -196,12 +198,14 @@
             <button class="btn icon-pause" id="pauseBtn"></button>
             <button class="btn icon-stop" id="stopBtn"></button>
             <button class="btn icon-next" onclick="alert('Next')"></button>
+            <button class="btn icon-eject" id="ejectBtn" title="Open File"></button>
         </div>
         
         <input type="range" min="0" max="100" value="50" class="volume-slider" id="volumeSlider">
     </div>
 
-    <audio id="audioPlayer" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+    <input type="file" id="fileInput" accept="audio/*">
+    <audio id="audioPlayer"></audio>
 
 </div>
 
@@ -210,11 +214,28 @@
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     const stopBtn = document.getElementById('stopBtn');
+    const ejectBtn = document.getElementById('ejectBtn');
+    const fileInput = document.getElementById('fileInput');
     const timeDisplay = document.getElementById('timeDisplay');
+    const fileInfo = document.getElementById('fileInfo');
     const volumeSlider = document.getElementById('volumeSlider');
 
+    ejectBtn.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const fileUrl = URL.createObjectURL(file);
+            audio.src = fileUrl;
+            audio.play();
+            fileInfo.innerText = "Playing Local File";
+        }
+    });
+
     playBtn.addEventListener('click', () => {
-        audio.play();
+        if (audio.src) audio.play();
     });
 
     pauseBtn.addEventListener('click', () => {
@@ -237,6 +258,10 @@
         timeDisplay.innerText = 
             (minutes < 10 ? '0' : '') + minutes + ':' + 
             (seconds < 10 ? '0' : '') + seconds;
+    });
+    
+    audio.addEventListener('ended', () => {
+        timeDisplay.innerText = "00:00";
     });
 </script>
 
